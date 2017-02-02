@@ -1,12 +1,19 @@
 '''
 Created on Nov 18, 2016
+Modified on Jan 25, 2017
 
 @author: Hyeong-Gi Hong
 '''
 import os.path
 import csv
+import tkinter as tk
+from tkinter.filedialog import askopenfilenames
 
 def create_keys():
+    """
+    This function will generate keys (indicators)
+    Keys format is:  number.letter.number
+    """
     indicators =  ("0.b.",)
     
     for sec1 in range(1, 10):
@@ -73,13 +80,13 @@ def indicators(info_list):
     """
     indicators_indice = []
     for index in range(len(info_list)):
-        if (info_list[index].startswith("1.") or info_list[index].startswith("2.") 
-            or info_list[index].startswith("3.") or info_list[index].startswith("4.") 
-            or info_list[index].startswith("5.") or info_list[index].startswith("6.") 
-            or info_list[index].startswith("7.") or info_list[index].startswith("8.") 
-            or info_list[index].startswith("9.")):
+        if (info_list[index].startswith("1. POPULATION:") or info_list[index].startswith("2. BUILDINGS:") 
+            or info_list[index].startswith("3.  NEW") or info_list[index].startswith("4. OVERHANG") 
+            or info_list[index].startswith("5. SALE") or info_list[index].startswith("6. MORTGAGE") 
+            or info_list[index].startswith("7. TOTAL") or info_list[index].startswith("8. DESCRIPTION") 
+            or info_list[index].startswith("9. LOCATION")):
             indicators_indice.append(index)
-    print(indicators_indice)
+            
     return indicators_indice
     
 def create_a_list(fin):
@@ -117,15 +124,15 @@ def process_file(info, indice):
             processed_list.extend([info[indice[index]+2], info[indice[index]+4]])
             
             for subscript in range(indice[index], indice[index+1]):
-                if (info[subscript].startswith("a.") or info[subscript].startswith("b.") or
-                    info[subscript].startswith("c.") or info[subscript].startswith("d.") or
-                    info[subscript].startswith("e.") or info[subscript].startswith("f.") or
-                    info[subscript].startswith("j.") or info[subscript].startswith("k.") or
-                    info[subscript].startswith("o.") or info[subscript].startswith("p.")):
+                if (info[subscript].startswith("a.  Type") or info[subscript].startswith("b.  Construction") or
+                    info[subscript].startswith("c.   Average") or info[subscript].startswith("d.  Repair") or
+                    info[subscript].startswith("e.   Occupancy") or info[subscript].startswith("f. Owner") or
+                    info[subscript].startswith("j.    Sales") or info[subscript].startswith("k.   Predicted") or
+                    info[subscript].startswith("o.   Rental") or info[subscript].startswith("p.   Predicted")):
                     processed_list.extend([info[subscript+1], info[subscript+2]])
-                elif (info[subscript].startswith("g.") or info[subscript].startswith("l.")):
+                elif (info[subscript].startswith("g.   1935") or info[subscript].startswith("l.    1935")):
                     processed_list.extend([info[subscript+1],info[subscript+3]])
-                elif (info[subscript].startswith("h.") or info[subscript].startswith("m.")):
+                elif (info[subscript].startswith("h.   1937") or info[subscript].startswith("m.  1937")):
                     processed_list.extend([info[subscript+1],info[subscript+2],info[subscript+3],info[subscript+4]])
                 elif (info[subscript].startswith("i.") or info[subscript].startswith("n.")):
                     processed_list.extend([info[subscript+1],info[subscript+3],info[subscript+4],info[subscript+5],info[subscript+6]])
@@ -174,12 +181,19 @@ def main():
     main function.
     Program will be started from this function
     """
-    fin = open("a-001.txt")
-    
-    info_list = create_a_list(fin)
-    indicator_indice = indicators(info_list)
-    processed_list = process_file(info_list, indicator_indice)
+    # creating keys first. This function won't process more than once.
     keys = create_keys()
-    output_file(keys, processed_list)
+    
+    # remove empty window for file chooser
+    tk.Tk().withdraw()
+    # file chooser dialog pop up
+    r_files = askopenfilenames()
+    
+    for file_name in r_files:
+        fin = open(file_name)
+        info_list = create_a_list(fin)
+        indicator_indice = indicators(info_list)
+        processed_list = process_file(info_list, indicator_indice)
+        output_file(keys, processed_list)
     
 main()
